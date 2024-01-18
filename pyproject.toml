@@ -10,12 +10,17 @@ readme = "README.md"
 requires-python = ">=3.9"
 license = {file = "LICENSE"}
 authors = [
-  {name = "First Author", email = "first@example.com"},
-  {name = "Second Author", email = "second@example.com"},
-  {name = "Third Author", email = "third@example.com"},
+  {name = "Evgenii Katsevman", email = "eugene.katsevman@gmail.com"},
+  {name = "Mihail Mayorov", email = "mihail1-m1@yandex.ru"}, 
+  {name = "Alexander Ignatov", email = "goodwinsis@yandex.ru"},
+  {name = "Alexander Mironov", email = "mironov.miet@gmail.com"},
+  {name = "Timur Timerkhanov", email = "timurgrunge@gmail.com"},
+  {name = "Ivan Shevyakov", email = "iashevyakov@mail.ru"},
+  {name = "Vladilav Nechaev", email = "vladislavtv1@gmail.com"},
+  {name = "Denis Dudnik", email = "Denis.Dudnik@gmail.com"},
 ]
 maintainers = [
-  {name = "First Maintainer", email = "maintainer@example.com"}
+  {name = "Denis Dudnik", email = "Denis.Dudnik@gmail.com"}
 ]
 keywords = ["django", "config", "easy config", "simple config"]
 classifiers = [
@@ -25,12 +30,15 @@ classifiers = [
     "Framework :: Django :: 4.0",
     "Framework :: Django :: 4.1",
     "Framework :: Django :: 4.2",
+    "Framework :: Django :: 4.3",
+    "Framework :: Django :: 5.0",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
