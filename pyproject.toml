@@ -50,8 +50,8 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://example.com"
-"Documentation" = "https://readthedocs.org"
-"Repository" = "https://github.com/me/spam.git"
-"Changelog" = "https://github.com/me/spam/blob/master/CHANGELOG.md"
-"Bug Tracker" = "https://github.com/pypa/sampleproject/issues"
+"Homepage" = "https://github.com/factory5group/django-liveconfigs"
+"Documentation" = "https://github.com/factory5group/django-liveconfigs/blob/main/README.md"
+"Repository" = "https://github.com/factory5group/django-liveconfigs"
+"Changelog" = "https://github.com/factory5group/django-liveconfigs/blob/main/CHANGELOG.md"
+"Bug Tracker" = "https://github.com/factory5group/django-liveconfigs/issues"
