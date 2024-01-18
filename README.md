@@ -154,8 +154,8 @@ if FirstExample.MY_FIRST_CONFIG > 20:
  ```
 
 ## Остались вопросы?
-+ Посмотрите примеры использования конфигов: https://gitlab.xplanet.tech/common/liveconfigs-example/
++ Посмотрите примеры использования конфигов: https://github.com/factory5group/django-liveconfigs-example/
 
-+ Примеры валидаторов : `validators.py` в https://gitlab.xplanet.tech/common/liveconfigs-example/
++ Примеры валидаторов : `validators.py` в https://github.com/factory5group/django-liveconfigs-example/
 
 + Напишите нам! 
