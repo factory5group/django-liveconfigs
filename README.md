@@ -96,7 +96,7 @@ class FirstExample(models.BaseConfig):
     SECOND_ONE: bool = False  
 ```
 
-4. Используете где-нибудь `FirstExample.MY_FIRST_FLAG` как обычный int:
+4. Используете где-нибудь `FirstExample.MY_FIRST_CONFIG` как обычный int:
 ```python
 from configs.configs import FirstExample
 ...
