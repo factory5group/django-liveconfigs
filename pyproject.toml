@@ -43,9 +43,11 @@ classifiers = [
 ]
 dependencies = [
   "Django>=3.2",
+  "Django<5",
   "djangorestframework>=3.13.1",
-  "typeguard==2.13.3",
-  "django-import-export==2.8.0",
+  "typeguard>=3.0.0",
+  "typeguard<=4.1.5",
+  "django-import-export>=2.8.0",
   "django-more-admin-filters==1.7",
 ]
 

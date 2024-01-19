@@ -16,14 +16,13 @@ logger = logging.getLogger()
 
 
 class ConfigRow(models.Model):
-    """ Простая модель для значения одного конфига """
+    """Простая модель для значения одного конфига"""
+
     name = models.TextField(primary_key=True)
     value = JSONField(blank=True, null=True)
     topic = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    tags = ArrayField(
-        models.TextField(blank=True, null=True), blank=True, null=True
-    )
+    tags = ArrayField(models.TextField(blank=True, null=True), blank=True, null=True)
     last_read = models.DateTimeField(blank=True, null=True)
     last_set = models.DateTimeField(blank=True, null=True)
     registered_row_types: dict[str, typing.Any] = dict()
@@ -34,9 +33,11 @@ class ConfigRow(models.Model):
         if not config_row_type:
             return
         try:
-            check_type(f"{self.name}", self.value, config_row_type)
+            check_type(self.value, config_row_type)
         except TypeError as exc:
-            raise exceptions.ValidationError(f"Type error of the input value '{self.name}': {exc}")
+            raise exceptions.ValidationError(
+                f"Type error of the input value '{self.name}': {exc}"
+            )
 
     def validate_value(self):
         validators = self.validators.get(self.name, None)
