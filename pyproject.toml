@@ -10,12 +10,17 @@ readme = "README.md"
 requires-python = ">=3.9"
 license = {file = "LICENSE"}
 authors = [
-  {name = "First Author", email = "first@example.com"},
-  {name = "Second Author", email = "second@example.com"},
-  {name = "Third Author", email = "third@example.com"},
+  {name = "Evgenii Katsevman", email = "eugene.katsevman@gmail.com"},
+  {name = "Mihail Mayorov", email = "mihail1-m1@yandex.ru"}, 
+  {name = "Alexander Ignatov", email = "goodwinsis@yandex.ru"},
+  {name = "Alexander Mironov", email = "mironov.miet@gmail.com"},
+  {name = "Timur Timerkhanov", email = "timurgrunge@gmail.com"},
+  {name = "Ivan Shevyakov", email = "iashevyakov@mail.ru"},
+  {name = "Vladilav Nechaev", email = "vladislavtv1@gmail.com"},
+  {name = "Denis Dudnik", email = "Denis.Dudnik@gmail.com"},
 ]
 maintainers = [
-  {name = "First Maintainer", email = "maintainer@example.com"}
+  {name = "Denis Dudnik", email = "Denis.Dudnik@gmail.com"}
 ]
 keywords = ["django", "config", "easy config", "simple config"]
 classifiers = [
@@ -32,6 +37,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
@@ -45,8 +51,8 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://example.com"
-"Documentation" = "https://readthedocs.org"
-"Repository" = "https://github.com/me/spam.git"
-"Changelog" = "https://github.com/me/spam/blob/master/CHANGELOG.md"
-"Bug Tracker" = "https://github.com/pypa/sampleproject/issues"
+"Homepage" = "https://github.com/factory5group/django-liveconfigs"
+"Documentation" = "https://github.com/factory5group/django-liveconfigs/blob/main/README.md"
+"Repository" = "https://github.com/factory5group/django-liveconfigs"
+"Changelog" = "https://github.com/factory5group/django-liveconfigs/blob/main/CHANGELOG.md"
+"Bug Tracker" = "https://github.com/factory5group/django-liveconfigs/issues"
