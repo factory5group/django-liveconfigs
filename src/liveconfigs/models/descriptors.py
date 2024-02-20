@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core import exceptions
 
 from liveconfigs.models.models import ConfigRow
-from liveconfigs.tasks import config_row_update_or_create
+from liveconfigs.signals import config_row_update_signal
 
 logger = logging.getLogger()
 
@@ -16,11 +16,6 @@ VALIDATORS_SUFFIX = "_VALIDATORS"
 
 
 CACHE_TTL = 1
-
-if settings.LIVECONFIGS_SYNCWRITE:
-    config_row_update_or_create_func = config_row_update_or_create
-else:
-    config_row_update_or_create_func = config_row_update_or_create.delay
 
 
 class ConfigRowDescriptor:
@@ -52,10 +47,12 @@ class ConfigRowDescriptor:
                 if db_row.last_read is None or (db_row.last_read < dt_now - dt.timedelta(days=1)):
                     update_fields['last_read'] = dt_now
                 if update_fields:
-                    config_row_update_or_create_func(self.config_name, update_fields)
+                    config_row_update_signal.send(sender=None, config_name=self.config_name,
+                                                  update_fields=update_fields)
                 self.last_value = db_row.value
             except exceptions.ObjectDoesNotExist:
-                logger.warning('no config %s in db, using default value %s', self.config_name, self.default_value)
+                logger.warning('no config %s in db, using default value %s',
+                               self.config_name, self.default_value)
                 self.last_value = self.default_value
                 update_fields = {
                     "name": self.config_name,
@@ -66,7 +63,8 @@ class ConfigRowDescriptor:
                     "last_read": dt_now,
                     "last_set": dt_now
                 }
-                config_row_update_or_create_func(self.config_name, update_fields)
+                config_row_update_signal.send(
+                    sender=None, config_name=self.config_name, update_fields=update_fields)
 
         self.next_check = now + CACHE_TTL
         return self.last_value
@@ -99,7 +97,8 @@ class ConfigMeta(type):
                 if prefix and n in config_row_types:
                     config_row_types[prefix + n] = config_row_types.pop(n)
                 dct[n] = ConfigRowDescriptor(prefix + n, v,
-                                             description=dct.get(n + DESCRIPTION_SUFFIX),
+                                             description=dct.get(
+                                                 n + DESCRIPTION_SUFFIX),
                                              tags=dct.get(n + TAGS_SUFFIX),
                                              topic=topic)
                 validators[n] = dct.get(n + VALIDATORS_SUFFIX)
@@ -108,7 +107,8 @@ class ConfigMeta(type):
             name: value
             for name, value in dct.items()
             if not any(
-                [name.endswith(DESCRIPTION_SUFFIX), name.endswith(TAGS_SUFFIX), name.endswith(VALIDATORS_SUFFIX)]
+                [name.endswith(DESCRIPTION_SUFFIX), name.endswith(
+                    TAGS_SUFFIX), name.endswith(VALIDATORS_SUFFIX)]
             )
         }
 

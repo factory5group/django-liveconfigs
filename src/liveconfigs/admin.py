@@ -8,6 +8,7 @@ from import_export.fields import Field
 from tablib import Dataset
 
 from .filters import MultiSelectFilterByArrayField
+from .forms import ConfigRowForm
 from .models import ConfigRow
 from .utils import get_excluded_rows
 
@@ -44,11 +45,14 @@ class ConfigRowResource(resources.ModelResource):
 
 
 class ConfigRowAdmin(ImportExportModelAdmin):
+    form = ConfigRowForm
     formats = [formats.base_formats.JSON]
     resource_class = ConfigRowResource
-    list_display = ('name', 'value', 'description', 'topic', 'tags', 'last_read', 'last_set')
+    list_display = ('name', 'value', 'description', 'topic',
+                    'tags', 'last_read', 'last_set')
     list_filter = ('topic', ('tags', MultiSelectFilterByArrayField),)
-    readonly_fields = ('name', 'description', 'topic', 'tags', 'last_read', 'last_set')
+    readonly_fields = ('name', 'description', 'topic',
+                       'tags', 'last_read', 'last_set')
     search_fields = ('name', 'description', 'topic', 'tags')
 
     def get_export_queryset(self, request):

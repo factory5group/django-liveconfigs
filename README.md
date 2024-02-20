@@ -33,7 +33,7 @@ if MyConfig.IS_FEATURE_ENABLED:
 + __теги__ - ключевые слова для быстрого поиска настроек. Одна настройка может иметь несколько тегов
 ## Со стороны разработчика
 
-Для разработчика настройки выглядят как статические члены-константы классов  python.
+Для разработчика настройки выглядят как статические члены-константы классов python.
 Их можно быстро добавить, убрать, их просто использовать (пара строк кода). Их понимает mytype и среды разработки.
 
 За создание новых конфигов отвечает разработчик.
@@ -63,17 +63,62 @@ if MyConfig.IS_FEATURE_ENABLED:
     ]
 ```
 
-2. Добавьте в settings еще одну строку.
+2. Добавьте в settings еще несколько строк.
 ```
+    # liveconfigs settings
+    # Максимальная длина текста в значении конфига при которой отображать поле редактирования конфига как textinput
+    # При длине текста в значении конфига большей этого значения - отображать поле редактирования конфига как textarea
+    LC_MAX_STR_LENGTH_DISPLAYED_AS_TEXTINPUT = 50
+    LC_ENABLE_PRETTY_INPUT = True
     LIVECONFIGS_SYNCWRITE = True    # sync write mode
 ```
 
 3. Заведите себе файл собственно с конфигами, например `configs/configs.py`
 ```python
 from liveconfigs import models
-from liveconfigs.validators import greater_than_x
+from liveconfigs.validators import greater_than
 from enum import Enum
-...
+
+# isort: off
+
+# config_row_update_signal_handler begin
+from django.conf import settings
+from django.dispatch import receiver
+from liveconfigs.signals import config_row_update_signal
+from liveconfigs.tasks import config_row_update_or_create
+
+# FIXME: Импорт приложения Celery из вашего проекта (если используете Celery)
+# FIXME: Вам нужно изменить этот код, если вы используете не Celery
+from celery_app import app
+
+# isort: on
+
+# Пример для Celery
+# Реальное сохранение данных выполняет функция config_row_update_or_create
+# Реализуйте отложенное сохранение удобным для вас методом
+# Для Celery зарегистрируйте эту задачу в CELERY_TASK_ROUTES
+# FIXME: Вам нужно изменить этот код, если вы используете не Celery
+@app.task(max_retries=1, soft_time_limit=1200, time_limit=1500)
+def config_row_update_or_create_proxy(config_name: str, update_fields: dict):
+    config_row_update_or_create(config_name, update_fields)
+
+
+@receiver(config_row_update_signal, dispatch_uid="config_row_update_signal")
+def config_row_update_signal_handler(sender, config_name, update_fields, **kwargs):
+    # Пример для Celery
+    # При настройках для синхронного сохранения функция будет вызвана напрямую
+    if settings.LIVECONFIGS_SYNCWRITE:
+        config_row_update_or_create_proxy_func = config_row_update_or_create_proxy
+    # При настройках для асинхронного сохранения функция будет вызвана через delay
+    # FIXME: Вам нужно изменить этот код, если вы используете не Celery
+    else:
+        config_row_update_or_create_proxy_func = config_row_update_or_create_proxy.delay
+
+    config_row_update_or_create_proxy_func(config_name, update_fields)
+
+
+# config_row_update_signal_handler end
+
 
 # тут перечислены возможные теги для настроек
 # из вашей предметной области
@@ -90,7 +135,7 @@ class FirstExample(models.BaseConfig):
     # следующие строчки необязательны
     MY_FIRST_CONFIG_DESCRIPTION = "Какая-то моя настройка"
     MY_FIRST_CONFIG_TAGS = [ConfigTags.basic, ConfigTags.other]
-    MY_FIRST_CONFIG_VALIDATORS = [greater_than_x(5)]
+    MY_FIRST_CONFIG_VALIDATORS = [greater_than(5)]
     
     # вторая настройка, без метаданных
     SECOND_ONE: bool = False  
@@ -137,25 +182,27 @@ if FirstExample.MY_FIRST_CONFIG > 20:
 и записи. Они помогают определить в живой системе, нужны ли все еще какие-то настройки
 или пора уже от них избавиться.
 ### Асинхронная запись
-Чтобы запись последней даты чтения не тормозила вам всю систему (если,например, конфиги часто читаются разными частами кода),
+Чтобы запись последней даты чтения не тормозила вам всю систему (если,например, конфиги часто читаются разными частями кода),
 можно вынести ее в задачу celery. Для этого:
  1. Установите переменную LIVECONFIGS_SYNCWRITE в `settings.py` в False:
  ```
      LIVECONFIGS_SYNCWRITE = False   # async write mode
  ```
  
- 2. Настройте запуск задачи `liveconfigs.tasks.config_row_update_or_create`:
+ 2. Если используете Celery, то настройте запуск задачи `configs.configs.config_row_update_or_create_proxy`:
  ```python
      CELERY_TASK_ROUTES = {
-         'liveconfigs.tasks.config_row_update_or_create': {
+         'configs.configs.config_row_update_or_create_proxy': {
              'queue': 'quick', 'routing_key': 'quick'
          },
      }
  ```
 
-## Остались вопросы?
-+ Посмотрите примеры использования конфигов: https://gitlab.xplanet.tech/common/liveconfigs-example/
+ 3. Если используете не Celery, то адаптируйте этот код под ваш случай
 
-+ Примеры валидаторов : `validators.py` в https://gitlab.xplanet.tech/common/liveconfigs-example/
+## Остались вопросы?
++ Посмотрите примеры использования конфигов: https://github.com/factory5group/django-liveconfigs-example/
+
++ Примеры валидаторов : `validators.py` в https://github.com/factory5group/django-liveconfigs-example/
 
 + Напишите нам! 
