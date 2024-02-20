@@ -11,7 +11,7 @@ requires-python = ">=3.9"
 license = {file = "LICENSE"}
 authors = [
   {name = "Evgenii Katsevman", email = "eugene.katsevman@gmail.com"},
-  {name = "Mihail Mayorov", email = "mihail1-m1@yandex.ru"}, 
+  {name = "Mihail Mayorov", email = "mihail1-m1@yandex.ru"},
   {name = "Alexander Ignatov", email = "goodwinsis@yandex.ru"},
   {name = "Alexander Mironov", email = "mironov.miet@gmail.com"},
   {name = "Timur Timerkhanov", email = "timurgrunge@gmail.com"},
@@ -37,6 +37,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
