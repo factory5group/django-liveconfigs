@@ -1,5 +1,6 @@
 import json
 from decimal import Decimal
+from types import UnionType
 from django import forms
 from django.conf import settings
 from liveconfigs.models import ConfigRow
@@ -17,7 +18,8 @@ class ConfigRowForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if settings.LC_ENABLE_PRETTY_INPUT:
+        instance_type = self.instance.registered_row_types.get(self.instance.name)
+        if settings.LC_ENABLE_PRETTY_INPUT and not isinstance(instance_type, UnionType):
             max_len = settings.LC_MAX_STR_LENGTH_DISPLAYED_AS_TEXTINPUT or 50
             val = self.instance.value
             if isinstance(val, bool):
@@ -42,3 +44,5 @@ class ConfigRowForm(forms.ModelForm):
                     self.fields["value"] = forms.CharField(
                         required=False, widget=forms.TextInput({"size": max_len})
                     )
+            elif isinstance(val, (list, dict)):
+                self.fields["value"] = forms.JSONField(encoder=PrettyJSONEncoder)

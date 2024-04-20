@@ -73,7 +73,7 @@ if MyConfig.IS_FEATURE_ENABLED:
     LIVECONFIGS_SYNCWRITE = True    # sync write mode
 ```
 
-3. Заведите себе файл собственно с конфигами, например `configs/configs.py`
+3. Заведите себе файл собственно с конфигами, например `config/config.py`
 ```python
 from liveconfigs import models
 from liveconfigs.validators import greater_than
@@ -120,8 +120,7 @@ def config_row_update_signal_handler(sender, config_name, update_fields, **kwarg
 # config_row_update_signal_handler end
 
 
-# тут перечислены возможные теги для настроек
-# из вашей предметной области
+# тут перечислены возможные теги для настроек из вашей предметной области
 class ConfigTags(str, Enum):
     front = "Настройки для фронта"
     features = "Фичи"
@@ -143,7 +142,7 @@ class FirstExample(models.BaseConfig):
 
 4. Используете где-нибудь `FirstExample.MY_FIRST_CONFIG` как обычный int:
 ```python
-from configs.configs import FirstExample
+from config.config import FirstExample
 ...
 if FirstExample.MY_FIRST_CONFIG > 20:
     print("Hello there!")
@@ -189,10 +188,10 @@ if FirstExample.MY_FIRST_CONFIG > 20:
      LIVECONFIGS_SYNCWRITE = False   # async write mode
  ```
  
- 2. Если используете Celery, то настройте запуск задачи `configs.configs.config_row_update_or_create_proxy`:
+ 2. Если используете Celery, то настройте запуск задачи `config.config.config_row_update_or_create_proxy`:
  ```python
      CELERY_TASK_ROUTES = {
-         'configs.configs.config_row_update_or_create_proxy': {
+         'config.config.config_row_update_or_create_proxy': {
              'queue': 'quick', 'routing_key': 'quick'
          },
      }

@@ -7,7 +7,7 @@ from import_export.admin import ImportExportModelAdmin
 from import_export.fields import Field
 from tablib import Dataset
 
-from .filters import MultiSelectFilterByArrayField
+from .filters import TagsListFilter
 from .forms import ConfigRowForm
 from .models import ConfigRow
 from .utils import get_excluded_rows
@@ -50,7 +50,7 @@ class ConfigRowAdmin(ImportExportModelAdmin):
     resource_class = ConfigRowResource
     list_display = ('name', 'value', 'description', 'topic',
                     'tags', 'last_read', 'last_set')
-    list_filter = ('topic', ('tags', MultiSelectFilterByArrayField),)
+    list_filter = ("topic", TagsListFilter,)
     readonly_fields = ('name', 'description', 'topic',
                        'tags', 'last_read', 'last_set')
     search_fields = ('name', 'description', 'topic', 'tags')

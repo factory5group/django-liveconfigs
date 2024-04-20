@@ -5,7 +5,7 @@ from django import VERSION
 from django.contrib.postgres.fields import ArrayField
 from django.core import exceptions
 from django.db import models
-from typeguard import check_type
+from typeguard import check_type, TypeCheckError
 
 if VERSION[0] == 3:
     from django.contrib.postgres.fields import JSONField
@@ -34,7 +34,7 @@ class ConfigRow(models.Model):
             return
         try:
             check_type(self.value, config_row_type)
-        except TypeError as exc:
+        except (TypeError, TypeCheckError) as exc:
             raise exceptions.ValidationError(
                 f"Type error of the input value '{self.name}': {exc}"
             )

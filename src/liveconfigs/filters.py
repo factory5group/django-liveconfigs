@@ -1,49 +1,96 @@
-from django.contrib import admin
-from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.utils import reverse_field_path
-from django.core.exceptions import ValidationError
-from django.db.models import Q
-from more_admin_filters import MultiSelectFilter
+from django.contrib.admin import SimpleListFilter
+from django.utils.translation import gettext_lazy as _
 
 
-class MultiSelectFilterByArrayField(MultiSelectFilter):
-    def __init__(self, field, request, params, model, model_admin, field_path):
-        self.lookup_kwarg = '%s__overlap' % field_path
-        self.lookup_kwarg_isnull = '%s__isnull' % field_path
-        lookup_vals = request.GET.get(self.lookup_kwarg)
-        self.lookup_vals = lookup_vals.split(',') if lookup_vals else list()
-        self.lookup_val_isnull = request.GET.get(self.lookup_kwarg_isnull)
-        self.empty_value_display = model_admin.get_empty_value_display()
-        parent_model, reverse_path = reverse_field_path(model, field_path)
-        if model == parent_model:
-            queryset = model_admin.get_queryset(request)
+class ArrayFieldListFilter(SimpleListFilter):
+    """An admin list filter for ArrayFields."""
+
+    def lookups(self, request, model_admin):
+        """Return the filtered queryset."""
+        queryset_values = model_admin.model.objects.values_list(
+            self.parameter_name, flat=True
+        )
+        values = []
+        for sublist in queryset_values:
+            if sublist:
+                for value in sublist:
+                    if value:
+                        values.append((value, value))
+            else:
+                values.append(("null", "-"))
+        return sorted(set(values))
+
+    def get_lookup_next(self, filter_params: dict, lookup: str):
+        parameter_name = self.parameter_name
+        lookup_next: list | str | None = filter_params.get(parameter_name) or []
+        if lookup_next:
+            lookup_next = (
+                lookup_next[0].split(",")
+                if isinstance(lookup_next, list)
+                else lookup_next.split(",")
+            )
+        if lookup in lookup_next:
+            lookup_next.remove(lookup)
         else:
-            queryset = parent_model._default_manager.all()
-        lookup_choices = (queryset
-                          .distinct()
-                          .order_by(field.name)
-                          .values_list(field.name))
-        self.lookup_choices = {tag for config_row in lookup_choices if config_row[0] for tag in config_row[0]}
-        super(admin.AllValuesFieldListFilter, self).__init__(field, request, params, model, model_admin, field_path)
-        self.used_parameters = self.prepare_used_parameters(self.used_parameters)
+            lookup_next.append(lookup)
+        return ",".join(lookup_next)
+
+    def choices(self, changelist):
+        add_facets = False
+        try:
+            add_facets = changelist.add_facets
+            facet_counts = self.get_facet_queryset(changelist) if add_facets else None
+        except AttributeError:
+            # в Django < 5.0 нет этого функционала
+            pass
+        yield {
+            "selected": self.value() is None,
+            "query_string": changelist.get_query_string(remove=[self.parameter_name]),
+            "display": _("All"),
+        }
+
+        for i, (lookup, title) in enumerate(self.lookup_choices):
+            if add_facets:
+                if (count := facet_counts.get(f"{i}__c", -1)) != -1:
+                    title = f"{title} ({count})"
+                else:
+                    title = f"{title} (-)"
+            lookup_next = self.get_lookup_next(changelist.get_filters_params(), lookup)
+
+            yield {
+                "selected": str(lookup) in (self.value() or []),
+                "query_string": (
+                    changelist.get_query_string({self.parameter_name: lookup_next})
+                    if lookup_next
+                    else changelist.get_query_string(remove=[self.parameter_name])
+                ),
+                "display": title,
+            }
+
+    def value(self):
+        """
+        Return the value (in string format) provided in the request's
+        query string for this filter, if any, or None if the value wasn't
+        provided.
+        """
+        _value = self.used_parameters.get(self.parameter_name)
+        if _value:
+            _value = _value.split(",")
+        return _value
 
     def queryset(self, request, queryset):
-        params = Q()
-        list_params = []
-        lookup_arg = 'overlap'
-        for lookup_arg, value in self.used_parameters.items():
-            lookup_arg = lookup_arg
-            list_params.append(value)
-        if list_params:
-            params = Q(**{lookup_arg: [param for params in list_params for param in params]})
-        try:
-            return queryset.filter(params)
-        except (ValueError, ValidationError) as e:
-            raise IncorrectLookupParameters(e)
+        """Return the filtered queryset."""
+        lookup_value = self.value()
+        if lookup_value:
+            lookup_filter = (
+                {"{}__isnull".format(self.parameter_name): True}
+                if lookup_value == "null"
+                else {"{}__overlap".format(self.parameter_name): lookup_value}
+            )
+            queryset = queryset.filter(**lookup_filter)
+        return queryset
 
-    def prepare_used_parameters(self, used_parameters):
-        for key, value in used_parameters.items():
-            if not key.endswith('__overlap'):
-                continue
-            used_parameters[key] = value.split(',')
-        return used_parameters
+
+class TagsListFilter(ArrayFieldListFilter):
+    title = "tags"
+    parameter_name = "tags"
