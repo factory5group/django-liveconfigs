@@ -15,7 +15,7 @@ TAGS_SUFFIX = "_TAGS"
 VALIDATORS_SUFFIX = "_VALIDATORS"
 
 
-CACHE_TTL = 1
+CACHE_TTL = getattr(settings, 'LC_CACHE_TTL', 1)
 
 
 class ConfigRowDescriptor:
@@ -46,6 +46,8 @@ class ConfigRowDescriptor:
                     update_fields['topic'] = self.topic
                 if db_row.last_read is None or (db_row.last_read < dt_now - dt.timedelta(days=1)):
                     update_fields['last_read'] = dt_now
+                if db_row.default_value != self.default_value:
+                    update_fields['default_value'] = self.default_value
                 if update_fields:
                     config_row_update_signal.send(sender=None, config_name=self.config_name,
                                                   update_fields=update_fields)
@@ -61,7 +63,8 @@ class ConfigRowDescriptor:
                     "tags": self.tags,
                     "topic": self.topic,
                     "last_read": dt_now,
-                    "last_set": dt_now
+                    "last_set": dt_now,
+                    "default_value": self.default_value,
                 }
                 config_row_update_signal.send(
                     sender=None, config_name=self.config_name, update_fields=update_fields)
@@ -92,7 +95,7 @@ class ConfigMeta(type):
         for n, v in dct.items():
             if (
                 not n.startswith('__')
-                and not any([n.endswith(DESCRIPTION_SUFFIX), n.endswith(TAGS_SUFFIX), n.endswith(VALIDATORS_SUFFIX)])
+                and not n.endswith((DESCRIPTION_SUFFIX, TAGS_SUFFIX, VALIDATORS_SUFFIX))
             ):
                 if prefix and n in config_row_types:
                     config_row_types[prefix + n] = config_row_types.pop(n)
@@ -106,10 +109,7 @@ class ConfigMeta(type):
         dct = {
             name: value
             for name, value in dct.items()
-            if not any(
-                [name.endswith(DESCRIPTION_SUFFIX), name.endswith(
-                    TAGS_SUFFIX), name.endswith(VALIDATORS_SUFFIX)]
-            )
+            if not name.endswith((DESCRIPTION_SUFFIX, TAGS_SUFFIX, VALIDATORS_SUFFIX))
         }
 
         ConfigRow.registered_row_types.update(config_row_types)

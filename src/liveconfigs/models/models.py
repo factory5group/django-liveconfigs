@@ -2,10 +2,11 @@ import logging
 import typing
 
 from django import VERSION
-from django.contrib.postgres.fields import ArrayField
+from django.conf import settings
 from django.core import exceptions
 from django.db import models
 from typeguard import check_type, TypeCheckError
+from django.utils import timezone
 
 if VERSION[0] == 3:
     from django.contrib.postgres.fields import JSONField
@@ -22,9 +23,10 @@ class ConfigRow(models.Model):
     value = JSONField(blank=True, null=True)
     topic = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    tags = ArrayField(models.TextField(blank=True, null=True), blank=True, null=True)
+    tags = JSONField(blank=True, null=True)
     last_read = models.DateTimeField(blank=True, null=True)
     last_set = models.DateTimeField(blank=True, null=True)
+    default_value = JSONField(blank=True, null=True)
     registered_row_types: dict[str, typing.Any] = dict()
     validators: dict[str, typing.Any] = dict()
 
@@ -57,3 +59,10 @@ class ConfigRow(models.Model):
 
     def __str__(self):
         return f"Config '{self.name}' = {self.value}, {self.description or ''}"
+
+
+class HistoryEvent(models.Model):
+    name = models.TextField()
+    value = JSONField(blank=True, null=True)
+    edit_at = models.DateTimeField(default=timezone.now)
+    edit_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

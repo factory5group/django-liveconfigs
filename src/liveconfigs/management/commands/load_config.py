@@ -20,6 +20,7 @@ def save_row(instance_row, reset=False):
         db_row.description = instance_row.description
         db_row.tags = instance_row.tags
         db_row.topic = instance_row.topic
+        db_row.default_value = instance_row.default_value
         db_row.save()
     except exceptions.ObjectDoesNotExist:
         ConfigRow.objects.create(
@@ -28,7 +29,8 @@ def save_row(instance_row, reset=False):
             description=instance_row.description,
             tags=instance_row.tags,
             topic=instance_row.topic,
-            last_set=dt.datetime.now(tz=dt.timezone.utc)
+            last_set=dt.datetime.now(tz=dt.timezone.utc),
+            default_value=instance_row.default_value,
         )
 
 
@@ -37,8 +39,7 @@ def load_config(reset=False, **kwargs):
     for config in subclasses:
         for name, row in config.__dict__.items():
             if not any(
-                [name.startswith('__'), name.endswith(DESCRIPTION_SUFFIX),
-                 name.endswith(TAGS_SUFFIX), name.endswith(VALIDATORS_SUFFIX)]
+                [name.startswith('__'), name.endswith((DESCRIPTION_SUFFIX, TAGS_SUFFIX, VALIDATORS_SUFFIX))]
             ):
                 save_row(row, reset=reset)
         logger.info(f"Config '{config.__name__}' load successfully")

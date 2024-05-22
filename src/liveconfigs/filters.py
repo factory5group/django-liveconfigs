@@ -2,7 +2,7 @@ from django.contrib.admin import SimpleListFilter
 from django.utils.translation import gettext_lazy as _
 
 
-class ArrayFieldListFilter(SimpleListFilter):
+class JSONFieldListFilter(SimpleListFilter):
     """An admin list filter for ArrayFields."""
 
     def lookups(self, request, model_admin):
@@ -85,12 +85,12 @@ class ArrayFieldListFilter(SimpleListFilter):
             lookup_filter = (
                 {"{}__isnull".format(self.parameter_name): True}
                 if lookup_value == "null"
-                else {"{}__overlap".format(self.parameter_name): lookup_value}
+                else {"{}__has_any_keys".format(self.parameter_name): lookup_value}
             )
             queryset = queryset.filter(**lookup_filter)
         return queryset
 
 
-class TagsListFilter(ArrayFieldListFilter):
+class TagsListFilter(JSONFieldListFilter):
     title = "tags"
     parameter_name = "tags"

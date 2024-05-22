@@ -22,24 +22,20 @@ class ConfigRowForm(forms.ModelForm):
         if settings.LC_ENABLE_PRETTY_INPUT and not isinstance(instance_type, UnionType):
             max_len = settings.LC_MAX_STR_LENGTH_DISPLAYED_AS_TEXTINPUT or 50
             val = self.instance.value
-            if isinstance(val, bool):
+            if instance_type is bool:
                 self.fields["value"] = forms.BooleanField(
                     required=False,
                 )
-            elif isinstance(val, int):
+            elif instance_type is int:
                 self.fields["value"] = forms.IntegerField(
                     required=False,
                 )
-            elif isinstance(val, float):
+            elif instance_type is float:
                 self.fields["value"] = forms.FloatField(
                     required=False,
                     widget=forms.NumberInput(attrs={"step": "0.1"}),
                 )
-            elif isinstance(val, Decimal):
-                self.fields["value"] = forms.DecimalField(
-                    required=False,
-                )
-            elif isinstance(val, str):
+            elif instance_type is str:
                 if len(val) <= max_len:
                     self.fields["value"] = forms.CharField(
                         required=False, widget=forms.TextInput({"size": max_len})
