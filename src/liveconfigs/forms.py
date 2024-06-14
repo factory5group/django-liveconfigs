@@ -1,5 +1,4 @@
 import json
-from decimal import Decimal
 from types import UnionType
 from django import forms
 from django.conf import settings
@@ -9,6 +8,10 @@ from liveconfigs.models import ConfigRow
 class PrettyJSONEncoder(json.JSONEncoder):
     def __init__(self, *args, indent, sort_keys, **kwargs):
         super().__init__(*args, indent=2, sort_keys=True, **kwargs)
+
+
+class JSONField(forms.JSONField):
+    empty_values = [None, "", ()]
 
 
 class ConfigRowForm(forms.ModelForm):
@@ -41,4 +44,4 @@ class ConfigRowForm(forms.ModelForm):
                         required=False, widget=forms.TextInput({"size": max_len})
                     )
             elif isinstance(val, (list, dict)):
-                self.fields["value"] = forms.JSONField(encoder=PrettyJSONEncoder)
+                self.fields["value"] = JSONField(encoder=PrettyJSONEncoder)

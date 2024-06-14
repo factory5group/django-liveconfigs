@@ -48,15 +48,32 @@ class ConfigRowAdmin(ImportExportModelAdmin):
     form = ConfigRowForm
     formats = [formats.base_formats.JSON]
     resource_class = ConfigRowResource
-    list_display = ('name', 'value', 'default_value', 'description', 'topic', 'tags', 'last_read', 'last_set')
+    list_display = ('name', 'value', 'is_changed', 'description', 'topic', 'tags', 'last_read', 'last_set')
+    fields = ('name', 'value', 'default_value', 'is_changed', 'description', 'topic', 'tags', 'last_read', 'last_set')
     list_filter = ("topic", TagsListFilter,)
-    readonly_fields = ('name', 'description', 'topic', 'tags', 'last_read', 'last_set', 'default_value')
+    readonly_fields = ('name', 'description', 'topic', 'tags', 'last_read', 'last_set', 'default_value', 'is_changed')
     search_fields = ('name', 'description', 'topic', 'tags')
+    actions = ['set_selected_config_rows_to_default']
+
+    def is_changed(self, obj):
+        return '▢' if obj.value == obj.default_value else '☑'
 
     def save_model(self, request, obj, form, change):
         user = request.user
         super().save_model(request, obj, form, change)
         HistoryEvent.objects.create(name=obj.name, value=obj.value, edit_at=timezone.now(), edit_by=user)
+
+    def set_selected_config_rows_to_default(self, request, queryset):
+        user = request.user
+        config_rows, history_events = [], []
+        for config_row in queryset:
+            config_row.value = config_row.default_value
+            history_event = HistoryEvent(name=config_row.name, value=config_row.default_value,
+                                         edit_at=timezone.now(), edit_by=user)
+            config_rows.append(config_row)
+            history_events.append(history_event)
+        ConfigRow.objects.bulk_update(config_rows, ["value"])
+        HistoryEvent.objects.bulk_create(history_events)
 
 
 @admin.register(HistoryEvent)

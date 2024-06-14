@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-liveconfigs"
-version = "1.0.3"
+version = "1.0.4"
 description = "Simple powerful and convenient configs for Django"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -22,7 +22,7 @@ authors = [
 maintainers = [
   {name = "Denis Dudnik", email = "Denis.Dudnik@gmail.com"}
 ]
-keywords = ["django", "config", "easy config", "simple config"]
+keywords = ["django", "config", "easy config", "simple config", "liveconfigs"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Framework :: Django :: 3.2",
@@ -46,7 +46,7 @@ dependencies = [
   "Django<=5.1",
   "djangorestframework>=3.13.1",
   "typeguard>=3.0.0",
-  "typeguard<=4.1.5",
+  "typeguard<5.0.0",
   "django-import-export>=2.8.0",
 ]
 

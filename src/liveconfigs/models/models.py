@@ -5,7 +5,7 @@ from django import VERSION
 from django.conf import settings
 from django.core import exceptions
 from django.db import models
-from typeguard import check_type, TypeCheckError
+from typeguard import check_type, TypeCheckError, CollectionCheckStrategy
 from django.utils import timezone
 
 if VERSION[0] == 3:
@@ -35,8 +35,8 @@ class ConfigRow(models.Model):
         if not config_row_type:
             return
         try:
-            check_type(self.value, config_row_type)
-        except (TypeError, TypeCheckError) as exc:
+            check_type(self.value, config_row_type, collection_check_strategy=CollectionCheckStrategy.ALL_ITEMS)
+        except TypeCheckError as exc:
             raise exceptions.ValidationError(
                 f"Type error of the input value '{self.name}': {exc}"
             )
