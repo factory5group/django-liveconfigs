@@ -1,5 +1,10 @@
 # Change history
 
+## 19-06-2024 (v1.0.5)
+- fixed: width for value column in case of long value
+- added: option LC_MAX_VISUAL_VALUE_LENGTH (check readme for details)
+- some visual changes in history details
+
 ## 14-06-2024 (v1.0.4)
 - fixed type validation
 - added: set default values for checked configs in admin panel (check configs in list, select action "Set selected config rows to default" and press "Go")

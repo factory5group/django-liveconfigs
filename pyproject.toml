@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-liveconfigs"
-version = "1.0.4"
+version = "1.0.5"
 description = "Simple powerful and convenient configs for Django"
 readme = "README.md"
 requires-python = ">=3.9"

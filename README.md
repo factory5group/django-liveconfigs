@@ -72,6 +72,9 @@ if MyConfig.IS_FEATURE_ENABLED:
     LC_ENABLE_PRETTY_INPUT = True
     LIVECONFIGS_SYNCWRITE = True    # sync write mode
     LC_CACHE_TTL = 1    # cache TTL in seconds (default = 1)
+    # Максимальная длина значения конфига (в текстовом представлении) при которой значение в списке выводится целиком
+    # При бОльшей длине визуал значения будет усечен ("Длинная строка" -> "Длин ... рока")
+    LC_MAX_VISUAL_VALUE_LENGTH = 50
 ```
 
 3. Заведите себе файл собственно с конфигами, например `config/config.py`
