@@ -54,17 +54,22 @@ if MyConfig.IS_FEATURE_ENABLED:
 ![Экран поиска и фильтрации конфигов](https://github.com/factory5group/django-liveconfigs/blob/main/images/filter_config.jpg?raw=true)
 
 ## Как начать пользоваться
-
-1. Добавьте "liveconfigs" в INSTALLED_APPS в settings:
+1. Установите пакет `django-liveconfigs` через pip, poetry или еще как-нибудь.
+```bash
+pip install django-liveconfigs
 ```
+
+2. Добавьте "liveconfigs" в INSTALLED_APPS в settings:
+```python
     INSTALLED_APPS = [
         ...,
+        "import_export",
         "liveconfigs",
     ]
 ```
 
-2. Добавьте в settings еще несколько строк.
-```
+3. Добавьте в settings еще несколько строк.
+```python
     # liveconfigs settings
     # Максимальная длина текста в значении конфига при которой отображать поле редактирования конфига как textinput
     # При длине текста в значении конфига большей этого значения - отображать поле редактирования конфига как textarea
@@ -77,7 +82,7 @@ if MyConfig.IS_FEATURE_ENABLED:
     LC_MAX_VISUAL_VALUE_LENGTH = 50
 ```
 
-3. Заведите себе файл собственно с конфигами, например `config/config.py`
+4. Заведите себе файл собственно с конфигами, например `config/config.py`
 ```python
 from liveconfigs import models
 from liveconfigs.validators import greater_than
@@ -144,7 +149,7 @@ class FirstExample(models.BaseConfig):
     SECOND_ONE: bool = False  
 ```
 
-4. Используете где-нибудь `FirstExample.MY_FIRST_CONFIG` как обычный int:
+5. Используете где-нибудь `FirstExample.MY_FIRST_CONFIG` как обычный int:
 ```python
 from config.config import FirstExample
 ...
