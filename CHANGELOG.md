@@ -1,5 +1,8 @@
 # Change history
 
+## 01-09-2024
+- new repository address: https://github.com/liveconfigs/django-liveconfigs
+
 ## 19-06-2024 (v1.0.5)
 - fixed: width for value column in case of long value
 - added: option LC_MAX_VISUAL_VALUE_LENGTH (check readme for details)
